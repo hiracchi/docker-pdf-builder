@@ -1,6 +1,14 @@
 FROM hiracchi/openssh:latest
 MAINTAINER Toshiyuki HIRANO <hiracchi@gmail.com>
 
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VERSION
+LABEL org.label-schema.build-date=$BUILD_DATE \
+      org.label-schema.vcs-ref=$VCS_REF \
+      org.label-schema.vcs-url="https://github.com/hiracchi/docker-pdfdev" \
+      org.label-schema.version=$VERSION
+
 # packages install
 RUN apk --update add --no-cache --virtual build-dependencies \
   make automake autoconf libtool cmake \
