@@ -1,4 +1,4 @@
-FROM hiracchi/openssh:latest
+FROM ubuntu:16.04
 MAINTAINER Toshiyuki HIRANO <hiracchi@gmail.com>
 
 ARG BUILD_DATE
@@ -9,49 +9,30 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-url="https://github.com/hiracchi/docker-pdfdev" \
       org.label-schema.version=$VERSION
 
-# packages install
-RUN apk --update add --no-cache --virtual build-dependencies \
-  make automake autoconf libtool cmake \
-  file unzip flex build-base \
-  gcc g++ gfortran \
-  && apk --update add --no-cache --virtual build-tool \
-  curl git \
-  perl \
-  python3 python3-dev \
-  lapack lapack-dev \
-  libgcrypt-dev \
-  freetype-dev \
-  cppunit \
-  emacs-nox \
-  && apk --update add --no-cache --virtual interactive \
-  bash openssh \
-  && rm -rf /var/cache/apk/*
+# ARG WORK_USER=docker
+ARG PROTEINDF_REPOSITORY="https://github.com/ProteinDF/ProteinDF.git"
 
-# setup python modules
-RUN ln -s /usr/include/locale.h /usr/include/xlocale.h
-RUN pip3 install --upgrade pip \
-  && pip3 install \
-  PyYAML msgpack-python \
-  numpy scipy matplotlib \
-  Jinja2 BeautifulSoup4 
+# packages =============================================================
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+  tcsh zsh \
+  build-essential ca-certificates \
+  git automake autoconf libtool cmake \
+  libopenblas-dev libatlas-dev \
+  liblapack-dev liblapacke-dev \
+  openmpi-bin libopenmpi-dev \
+  libblacs-mpi-dev libscalapack-mpi-dev \
+  clinfo opencl-headers libclc-dev mesa-opencl-icd \
+  libclblas-dev \
+  \
+  vim emacs less \
+  && apt-get clean && apt-get autoclean \
+  && rm -rf /var/lib/apt/lists/* \
+  && update-alternatives --config csh
 
-# HDF5  
-
-# openmpi & scalapack
-WORKDIR /tmp
-RUN curl -O "https://www.open-mpi.org/software/ompi/v2.0/downloads/openmpi-2.0.1.tar.bz2" \
-  && tar xvfj openmpi-2.0.1.tar.bz2 \
-  && cd openmpi-2.0.1 && mkdir build && cd build \
-  && ../configure --enable-orterun-prefix-by-default \
-  && make && make install \
-  && cd /tmp \
-  && curl -O "http://www.netlib.org/scalapack/scalapack-2.0.2.tgz" \
-  && tar xvfz scalapack-2.0.2.tgz \
-  && cd scalapack-2.0.2 && mkdir build && cd build \
-  && cmake .. \
-  && make && make install \
-  && rm -rf /tmp/*
-
-# service
-#CMD ["/usr/sbin/sshd -D -f /etc/ssh/sshd_config"]
+# build ProteinDF
+# USER ${WORK_USER}
+COPY build-pdf.sh /usr/local/src/
+RUN git clone "${PROTEINDF_REPOSITORY}" /usr/local/src/ProteinDF
+RUN (cd /usr/local/src/ProteinDF; ../build-pdf.sh)
 
