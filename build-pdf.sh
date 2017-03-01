@@ -1,8 +1,30 @@
 #!/bin/bash
 
 export LANG=C
-MY_PREFIX=${HOME}/local/ProteinDF
+# MY_PREFIX=/usr/local/ProteinDF
 
+# workdir =============================================================
+if [ x${WORKDIR} != x ]; then
+    cd ${WORKDIR}
+fi
+
+# checkout ============================================================
+if [ x${REPOSITORY} = x ]; then
+    REPOSITORY="https://github.com/ProteinDF/ProteinDF.git"
+fi
+if [ x${BRANCH} = x ]; then
+    BRANCH="master"
+fi
+if [ x${TRAVIS_BRANCH} != x ]; then
+    BRANCH="${TRAVIS_BRANCH}"
+fi
+
+echo "repository: ${REPOSITORY}"
+echo "branch: ${BRANCH}"
+
+git clone -b ${BRANCH} "${REPOSITORY}"
+
+# build setup =========================================================
 export F77=gfortran
 export FC=gfortran
 export CC=gcc
@@ -28,6 +50,11 @@ CONFIGURE_OPT=" \
  --with-lapack \
  --with-scalapack \
  "
+
+# build ===============================================================
+cd ProteinDF
+git status
+
 rm -rf autom4te.cache
 ./bootstrap.sh
 

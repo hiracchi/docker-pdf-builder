@@ -32,7 +32,15 @@ RUN apt-get update \
 
 # build ProteinDF
 # USER ${WORK_USER}
-COPY build-pdf.sh /usr/local/src/
-RUN git clone "${PROTEINDF_REPOSITORY}" /usr/local/src/ProteinDF
-RUN (cd /usr/local/src/ProteinDF; ../build-pdf.sh)
+COPY build-pdf.sh /usr/local/bin/
+# RUN git clone "${PROTEINDF_REPOSITORY}" /usr/local/src/ProteinDF
+# RUN (cd /usr/local/src/ProteinDF; ../build-pdf.sh)
+
+
+# entrypoint
+COPY docker-entrypoint.sh /
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["/usr/local/bin/build-pdf.sh"]
+
+
 
