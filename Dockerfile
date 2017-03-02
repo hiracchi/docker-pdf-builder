@@ -6,7 +6,7 @@ ARG VCS_REF
 ARG VERSION
 LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-ref=$VCS_REF \
-      org.label-schema.vcs-url="https://github.com/hiracchi/docker-pdfdev" \
+      org.label-schema.vcs-url="https://github.com/hiracchi/docker-pdf-builder" \
       org.label-schema.version=$VERSION
 
 # ARG WORK_USER=docker
@@ -30,11 +30,9 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/* \
   && update-alternatives --config csh
 
+
 # build ProteinDF
-# USER ${WORK_USER}
 COPY build-pdf.sh /usr/local/bin/
-# RUN git clone "${PROTEINDF_REPOSITORY}" /usr/local/src/ProteinDF
-# RUN (cd /usr/local/src/ProteinDF; ../build-pdf.sh)
 
 
 # entrypoint
