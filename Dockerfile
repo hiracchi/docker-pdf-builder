@@ -32,13 +32,15 @@ RUN apt-get update \
 
 
 # build ProteinDF
-COPY build-pdf.sh /usr/local/bin/
+ENV WORKDIR=/usr/local/src/ProteinDF PREFIX=/usr/local/ProteinDF
+RUN  mkdir -p ${WORKDIR} && chmod a+w ${WORKDIR} \
+  && mkdir -p ${PREFIX}  && chmod a+w ${PREFIX}
+COPY pdf-builder.sh /usr/local/bin/
 
-
-# entrypoint
+# entrypoint 
 COPY docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["/usr/local/bin/build-pdf.sh"]
+CMD ["/usr/local/bin/pdf-builder.sh"]
 
 
 
