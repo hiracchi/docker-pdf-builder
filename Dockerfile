@@ -29,6 +29,13 @@ RUN apt-get update \
   libclblas-dev \
   \
   vim emacs less \
+  \
+  python3-dev python3-numpy python3-scipy python3-pandas \
+  python3-matplotlib \
+  python3-yaml python3-msgpack \
+  python3-jinja2 \
+  python3-sklearn-lib \
+  python3-requests python3-bs4 \
   && apt-get clean && apt-get autoclean \
   && rm -rf /var/lib/apt/lists/* \
   && update-alternatives --config csh
@@ -39,7 +46,8 @@ RUN groupadd -g ${PDF_GRPID} ${PDF_GRP} \
   && useradd -u ${PDF_USERID} -g ${PDF_GRP} -d /home/${PDF_USER} -s /sbin/nologin ${PDF_USER}
 ENV SRCDIR=/home/${PDF_USER}/local/src/ProteinDF \
   PDF_HOME=/home/${PDF_USER}/local/ProteinDF \
-  PATH=${PATH}:${PDF_HOME}/bin
+  PATH=${PATH}:${PDF_HOME}/bin \
+  PYTHONPATH=${PDF_HOME}/lib/python3.5
 COPY pdf-builder.sh /usr/local/bin/
 
 

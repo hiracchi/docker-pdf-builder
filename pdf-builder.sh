@@ -2,15 +2,22 @@
 
 export LANG=C
 
+# setup parameters =====================================================
 if [ x${PDF_HOME} = x ]; then
     PDF_HOME="/usr/local/ProteinDF"
 fi
+
+if [ x${BRANCH} = x ]; then
+    BRANCH="master"
+fi
+
 if [ x${TMP} = x ]; then
     TMP=/tmp
 fi
 
 # show parameter
 echo "PDF_HOME=${PDF_HOME}"
+echo "BRANCH=${BRANCH}"
 echo "SRCDIR=${SRCDIR}"
 echo "TMP=${TMP}"
 
@@ -19,9 +26,6 @@ checkout-pdf()
 {
     if [ x${REPOSITORY} = x ]; then
         REPOSITORY="https://github.com/ProteinDF/ProteinDF.git"
-    fi
-    if [ x${BRANCH} = x ]; then
-        BRANCH="master"
     fi
     if [ x${TRAVIS_BRANCH} != x ]; then
         BRANCH="${TRAVIS_BRANCH}"
@@ -32,6 +36,50 @@ checkout-pdf()
     
     git clone -b ${BRANCH} "${REPOSITORY}"
 }
+
+
+install-pyapp()
+{
+    APP=$1
+    REPOSITORY=$2
+    BRANCH=$3
+
+    echo ">>>> install python app"
+    echo "repository: ${REPOSITORY}"
+    echo "branch: ${BRANCH}"
+    echo "install prefix(PDF_HOME): ${PDF_HOME}"
+
+    cd ${TMP}
+    git clone -b ${BRANCH} "${REPOSITORY}" "${APP}"
+    cd ${APP}
+    python3 setup.py build
+    python3 setup.py install --prefix=${PDF_HOME}
+}
+
+
+install-bridge()
+{
+    install-pyapp ProteinDF_bridge \
+                  "https://github.com/ProteinDF/ProteinDF_bridge.git" \
+                  ${BRANCH}
+}
+
+
+install-pdfpytools()
+{
+    install-pyapp ProteinDF_pytools \
+                  "https://github.com/ProteinDF/ProteinDF_pytools.git" \
+                  ${BRANCH}
+}
+
+
+install-QCLObot()
+{
+    install-pyapp QCLObot \
+                  "https://github.com/ProteinDF/QCLObot.git" \
+                  ${BRANCH}
+}
+
 
 
 # build setup =========================================================
@@ -61,6 +109,12 @@ CONFIGURE_OPT=" \
  --with-lapack \
  --with-scalapack \
  "
+
+
+# install python Apps  ================================================
+install-bridge
+install-pdfpytools
+install-QCLObot
 
 
 # build ===============================================================
