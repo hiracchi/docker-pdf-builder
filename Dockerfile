@@ -9,7 +9,10 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-url="https://github.com/hiracchi/docker-pdf-builder" \
       org.label-schema.version=$VERSION
 
-# ARG WORK_USER=docker
+ARG PDF_GRP=pdf
+ARG PDF_GRPID=56670
+ARG PDF_USER=pdf
+ARG PDF_USERID=56670
 ARG PROTEINDF_REPOSITORY="https://github.com/ProteinDF/ProteinDF.git"
 
 # packages =============================================================
@@ -31,16 +34,17 @@ RUN apt-get update \
   && update-alternatives --config csh
 
 
-# build ProteinDF
-ENV WORKDIR=/usr/local/src/ProteinDF PREFIX=/usr/local/ProteinDF
-RUN  mkdir -p ${WORKDIR} && chmod a+w ${WORKDIR} \
-  && mkdir -p ${PREFIX}  && chmod a+w ${PREFIX}
+# building env for ProteinDF
+RUN groupadd -g ${PDF_GRPID} ${PDF_GRP} \
+  && useradd -u ${PDF_USERID} -g ${PDF_GRP} -d /home/${PDF_USER} -s /sbin/nologin ${PDF_USER}
+ENV SRCDIR=/home/${PDF_USER}/local/src/ProteinDF \
+  PDF_HOME=/home/${PDF_USER}/local/ProteinDF \
+  PATH=${PATH}:${PDF_HOME}/bin
 COPY pdf-builder.sh /usr/local/bin/
+
 
 # entrypoint 
 COPY docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["/usr/local/bin/pdf-builder.sh"]
-
-
-
+USER ${PDF_USER}

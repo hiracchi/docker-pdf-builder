@@ -2,14 +2,17 @@
 
 export LANG=C
 
-# show parameter
-echo "WORKDIR=${WORKDIR}"
-echo "PREFIX=${PREFIX}"
-echo "TMP=${TMP}"
-
+if [ x${PDF_HOME} = x ]; then
+    PDF_HOME="/usr/local/ProteinDF"
+fi
 if [ x${TMP} = x ]; then
     TMP=/tmp
 fi
+
+# show parameter
+echo "PDF_HOME=${PDF_HOME}"
+echo "SRCDIR=${SRCDIR}"
+echo "TMP=${TMP}"
 
 # checkout ============================================================
 checkout-pdf()
@@ -52,19 +55,17 @@ export SCALAPACK_LIBS="-lscalapack-openmpi -lblacs-openmpi -lblacsCinit-openmpi 
 
 
 CONFIGURE_OPT=" \
+ --prefix=${PDF_HOME} \
  --enable-parallel \
  --with-blas \
  --with-lapack \
  --with-scalapack \
  "
 
-if [ x${PREFIX} != x ]; then
-    CONFIGURE_OPT="--prefix=${PREFIX} ${CONFIGURE_OPT}"
-fi
 
 # build ===============================================================
-if [ x${WORKDIR} != x ]; then
-    cd ${WORKDIR}
+if [ x${SRCDIR} != x ]; then
+    cd ${SRCDIR}
 fi
 
 if [ -f bootstrap.sh ]; then
@@ -74,8 +75,7 @@ fi
 
 mkdir -p ${TMP}/build
 cd ${TMP}/build
-${WORKDIR}/configure ${CONFIGURE_OPT} 2>&1 | tee out.configure
+${SRCDIR}/configure ${CONFIGURE_OPT} 2>&1 | tee out.configure
 make -j 3 2>&1 | tee out.make
 make install 2>&1 | tee out.make_install
-
 
