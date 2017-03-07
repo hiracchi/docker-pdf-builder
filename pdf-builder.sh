@@ -97,7 +97,7 @@ echo "install to PDF_HOME=${PDF_HOME}"
 echo "SRCDIR=${WORKDIR}"
 
 cd ${SRCDIR}
-if [ -f ${SRCDIR}/bootstrap.sh ]; then
+if [ ! -f ${SRCDIR}/configure ]; then
     rm -rf autom4te.cache
     ${SRCDIR}/bootstrap.sh
 fi
@@ -110,5 +110,5 @@ ${SRCDIR}/configure ${CONFIGURE_OPT} 2>&1 | tee out.configure
 make -j 3 2>&1 | tee out.make
 make install 2>&1 | tee out.make_install
 
-
+exit $?
 
