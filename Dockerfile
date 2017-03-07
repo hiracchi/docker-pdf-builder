@@ -9,11 +9,13 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-url="https://github.com/hiracchi/docker-pdf-builder" \
       org.label-schema.version=$VERSION
 
+ARG PDF_HOME="/opt/ProteinDF"
+ARG WORKDIR="/work"
+
 ARG PDF_GRP=pdf
 ARG PDF_GRPID=56670
 ARG PDF_USER=pdf
 ARG PDF_USERID=56670
-ARG PROTEINDF_REPOSITORY="https://github.com/ProteinDF/ProteinDF.git"
 
 # packages =============================================================
 RUN apt-get update \
@@ -42,17 +44,23 @@ RUN apt-get update \
 
 
 # building env for ProteinDF
-RUN groupadd -g ${PDF_GRPID} ${PDF_GRP} \
-  && useradd -u ${PDF_USERID} -g ${PDF_GRP} -d /home/${PDF_USER} -s /sbin/nologin ${PDF_USER}
-ENV SRCDIR=/home/${PDF_USER}/local/src/ProteinDF \
-  PDF_HOME=/home/${PDF_USER}/local/ProteinDF \
-  PATH=${PATH}:${PDF_HOME}/bin \
-  PYTHONPATH=${PDF_HOME}/lib/python3.5
-COPY pdf-builder.sh /usr/local/bin/
+ENV PDF_HOME="${PDF_HOME}" PATH="${PATH}:${PDF_HOME}/bin" PYTHONPATH="${PDF_HOME}/lib/python3.5/site-packages"
+RUN mkdir -p ${PDF_HOME} ${WORKDIR}
 
+RUN groupadd -g ${PDF_GRPID} ${PDF_GRP} \
+  && useradd -u ${PDF_USERID} -g ${PDF_GRP} -d /home/${PDF_USER} -s /sbin/nologin ${PDF_USER} \
+  && mkdir -p /home/${PDF_USER} \
+  && chown -R ${PDF_USER}:${PDF_GRP} /home/${PDF_USER} \
+  && chown -R ${PDF_USER}:${PDF_GRP} ${PDF_HOME} \
+  && chown -R ${PDF_USER}:${PDF_GRP} ${WORKDIR}
+
+COPY show-usage.sh pdf-*.sh /usr/local/bin/
 
 # entrypoint 
 COPY docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["/usr/local/bin/pdf-builder.sh"]
+CMD ["/usr/local/bin/show-usage.sh"]
+
 USER ${PDF_USER}
+WORKDIR ${WORKDIR}
+VOLUME ["${PDF_HOME}", "${WORKDIR}"]

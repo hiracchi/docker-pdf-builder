@@ -3,83 +3,64 @@
 export LANG=C
 
 # setup parameters =====================================================
-if [ x${PDF_HOME} = x ]; then
-    PDF_HOME="/usr/local/ProteinDF"
-fi
+export PDF_HOME=${PDF_HOME:-"/usr/local/ProteinDF"}
+SRCDIR=${SRCDIR:-`pwd`}
 
-if [ x${BRANCH} = x ]; then
-    BRANCH="master"
+REPOSITORY=${REPOSITORY:-"https://github.com/ProteinDF/ProteinDF.git"}
+BRANCH=${BRANCH:-"master"}
+if [ x${TRAVIS_BRANCH} != x ]; then
+    BRANCH="${TRAVIS_BRANCH}"
 fi
+TMP=${TMP:-"/tmp"}
 
-if [ x${TMP} = x ]; then
-    TMP=/tmp
+
+# option ==============================================================
+for OPT in "$@"; do
+    case "$OPT" in
+        '-o'|'--out-of-source')
+            if [[ -z "${2}" ]] || [[ "${2}" =~ ^-+ ]]; then
+                echo "$PROGNAME: option requires an argument -- ${1}" 1>&2
+                exit 1
+            fi
+            OPT_O="$2"
+            shift 2
+            ;;
+        
+        '-s'|'--source')
+            if [[ -z "${2}" ]] || [[ "${2}" =~ ^-+ ]]; then
+                echo "$PROGNAME: option requires an argument -- ${1}" 1>&2
+                exit 1
+            fi
+            OPT_S="$2"
+            shift 2
+            ;;
+        
+        -*)
+            echo "unknown option: ${1}"
+            exit 1
+            ;;
+        *)
+            shift
+            ;;
+    esac
+done
+
+if [ -n "${OPT_S}" ]; then
+    SRCDIR=${OPT_S}
 fi
+OUT_OF_SOURCE=${OPT_O}
 
-# show parameter
-echo "PDF_HOME=${PDF_HOME}"
-echo "BRANCH=${BRANCH}"
-echo "SRCDIR=${SRCDIR}"
-echo "TMP=${TMP}"
 
 # checkout ============================================================
-checkout-pdf()
+checkout()
 {
-    if [ x${REPOSITORY} = x ]; then
-        REPOSITORY="https://github.com/ProteinDF/ProteinDF.git"
-    fi
-    if [ x${TRAVIS_BRANCH} != x ]; then
-        BRANCH="${TRAVIS_BRANCH}"
-    fi
-    
     echo "repository: ${REPOSITORY}"
     echo "branch: ${BRANCH}"
-    
-    git clone -b ${BRANCH} "${REPOSITORY}"
+
+    cd ${SRCDIR}
+    git clone -b ${BRANCH} "${REPOSITORY}" .
+    cd ${SRCDIR}/ProteinDF
 }
-
-
-install-pyapp()
-{
-    APP=$1
-    REPOSITORY=$2
-    BRANCH=$3
-
-    echo ">>>> install python app"
-    echo "repository: ${REPOSITORY}"
-    echo "branch: ${BRANCH}"
-    echo "install prefix(PDF_HOME): ${PDF_HOME}"
-
-    cd ${TMP}
-    git clone -b ${BRANCH} "${REPOSITORY}" "${APP}"
-    cd ${APP}
-    python3 setup.py build
-    python3 setup.py install --prefix=${PDF_HOME}
-}
-
-
-install-bridge()
-{
-    install-pyapp ProteinDF_bridge \
-                  "https://github.com/ProteinDF/ProteinDF_bridge.git" \
-                  ${BRANCH}
-}
-
-
-install-pdfpytools()
-{
-    install-pyapp ProteinDF_pytools \
-                  "https://github.com/ProteinDF/ProteinDF_pytools.git" \
-                  ${BRANCH}
-}
-
-
-install-QCLObot()
-{
-    install-pyapp QCLObot \
-                  "https://github.com/ProteinDF/QCLObot.git" \
-                  ${BRANCH}
-}
-
 
 
 # build setup =========================================================
@@ -94,7 +75,7 @@ export CFLAGS=" \
  "
 export CXXFLAGS="${CFLAGS} -std=c++11"
 export CXXFLAGS=${CFLAGS}
-#export MPICXX=${HOME}/local/gnu/openmpi/bin/mpicxx
+#export MPICXX=
 export LIBS="-lgfortran -lm -static-libgcc"
 
 export BLAS_LIBS="-lblas"
@@ -111,25 +92,23 @@ CONFIGURE_OPT=" \
  "
 
 
-# install python Apps  ================================================
-install-bridge
-install-pdfpytools
-install-QCLObot
-
-
 # build ===============================================================
-if [ x${SRCDIR} != x ]; then
-    cd ${SRCDIR}
-fi
+echo "install to PDF_HOME=${PDF_HOME}"
+echo "SRCDIR=${WORKDIR}"
 
-if [ -f bootstrap.sh ]; then
+cd ${SRCDIR}
+if [ -f ${SRCDIR}/bootstrap.sh ]; then
     rm -rf autom4te.cache
-    ./bootstrap.sh
+    ${SRCDIR}/bootstrap.sh
 fi
 
-mkdir -p ${TMP}/build
-cd ${TMP}/build
+if [ x${OUT_OF_SOURCE} != x ]; then
+    mkdir -p ${OUT_OF_SOURCE}
+    cd ${OUT_OF_SOURCE}
+fi
 ${SRCDIR}/configure ${CONFIGURE_OPT} 2>&1 | tee out.configure
 make -j 3 2>&1 | tee out.make
 make install 2>&1 | tee out.make_install
+
+
 
