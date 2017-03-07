@@ -97,10 +97,10 @@ echo "install to PDF_HOME=${PDF_HOME}"
 echo "SRCDIR=${WORKDIR}"
 
 cd ${SRCDIR}
-if [ ! -f ${SRCDIR}/configure ]; then
-    rm -rf autom4te.cache
-    ${SRCDIR}/bootstrap.sh
-fi
+#if [ ! -f ${SRCDIR}/configure ]; then
+#    rm -rf autom4te.cache
+#    ${SRCDIR}/bootstrap.sh
+#fi
 
 if [ x${OUT_OF_SOURCE} != x ]; then
     mkdir -p ${OUT_OF_SOURCE}

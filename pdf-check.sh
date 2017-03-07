@@ -73,6 +73,4 @@ checkout
 echo "run test..."
 make check_serial
 
-exit $?
-
 
