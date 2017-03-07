@@ -106,9 +106,7 @@ if [ x${OUT_OF_SOURCE} != x ]; then
     mkdir -p ${OUT_OF_SOURCE}
     cd ${OUT_OF_SOURCE}
 fi
-${SRCDIR}/configure ${CONFIGURE_OPT} 2>&1 | tee out.configure
-make -j 3 2>&1 | tee out.make
-make install 2>&1 | tee out.make_install
 
-exit $?
+${SRCDIR}/configure ${CONFIGURE_OPT} 
+make -j 3 && make install 
 
