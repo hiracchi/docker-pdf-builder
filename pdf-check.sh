@@ -42,12 +42,20 @@ for OPT in "$@"; do
             shift 2
             ;;
         
+        '--'|'-')
+            shift 1
+            param+=( "$@" )
+            break
+            ;;
         -*)
             echo "unknown option: ${OPT}"
             exit 1
             ;;
         *)
-            shift 1
+            if [[ ! -z "$1" ]] && [[ ! "$1" =~ ^-+ ]]; then
+                param+=( "$1" )
+                shift 1
+            fi
             ;;
     esac
 done
@@ -70,6 +78,8 @@ cd ${WORKDIR}
 echo "checkout ..."
 checkout
 
-echo "run test..."
-make check_serial_dev
+for i in ${param[@]}; do
+    echo "run test (check_${i})..."
+    PDF_TEST_ARGS="--simple" make check_${i}
+done
 

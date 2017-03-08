@@ -35,12 +35,20 @@ for OPT in "$@"; do
             shift 2
             ;;
         
+        '--'|'-')
+            shift 1
+            param+=( "$@" )
+            break
+            ;;
         -*)
             echo "unknown option: ${1}"
             exit 1
             ;;
         *)
-            shift
+            if [[ ! -z "$1" ]] && [[ ! "$1" =~ ^-+ ]]; then
+                param+=( "$1" )
+                shift 1
+            fi
             ;;
     esac
 done
