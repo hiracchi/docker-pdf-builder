@@ -96,17 +96,23 @@ CONFIGURE_OPT=" \
 echo "install to PDF_HOME=${PDF_HOME}"
 echo "SRCDIR=${WORKDIR}"
 
-cd ${SRCDIR}
+#cd ${SRCDIR}
 #if [ ! -f ${SRCDIR}/configure ]; then
-#    rm -rf autom4te.cache
-#    ${SRCDIR}/bootstrap.sh
+#rm -rf autom4te.cache
+#${SRCDIR}/bootstrap.sh
 #fi
+
+cp -a ${SRCDIR} ${TMP}/pdf
+cd ${TMP}/pdf
+
+rm -rf autom4te.cache
+${SRCDIR}/bootstrap.sh
 
 if [ x${OUT_OF_SOURCE} != x ]; then
     mkdir -p ${OUT_OF_SOURCE}
     cd ${OUT_OF_SOURCE}
 fi
 
-${SRCDIR}/configure ${CONFIGURE_OPT} 
+./configure ${CONFIGURE_OPT} 
 make -j 3 && make install 
 
