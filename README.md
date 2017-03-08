@@ -13,25 +13,20 @@ The Docker image is prepared at Docker HUB.
 $ docker pull hiracchi/pdf-builder
 ```
 
-Then, execute the following script after you set the ProteinDF source code.
-You may get ProteinDF execution files in the `$LOCAL_PDF_HOME` directory.
+Then, execute the following script, which is included as "run-pdftest.sh", 
+after you set the ProteinDF source code at the current directory.
+You may get ProteinDF execution files in the `/opt/ProteinDF` directory in the container.
+
 
 ```bash
 #!/bin/bash
 
-LOCAL_PDF_HOME=${PWD}/tmp/ProteinDF
+PDF_RUNNER="pdfrunner"
 
-if [ ! -d ${LOCAL_PDF_HOME} ]; then
-    mkdir -p ${LOCAL_PDF_HOME}
-fi
-    
-USER_ID=`id -u`
-GROUP_ID=`id -g`
-    
-docker run --rm -it \
-  -v "${PWD}:/home/pdf/local/src/ProteinDF" \
-  -v "${LOCAL_PDF_HOME}:/home/pdf/local/ProteinDF" \
-  -u=${USER_ID}:${GROUP_ID} \
-  hiracchi/pdf-builder $@
+docker rm -f ${PDF_RUNNER} 2>&1 > /dev/null
+docker run -d --name ${PDF_RUNNER} -v "${PWD}:/work" hiracchi/pdf-builder
+docker exec -it ${PDF_RUNNER} pdf-py-setup.sh --work /tmp --branch develop
+docker exec -it ${PDF_RUNNER} pdf-builder.sh -o /tmp/pdf
+docker exec -it ${PDF_RUNNER} pdf-check.sh --branch develop serial_devB
 ```
 

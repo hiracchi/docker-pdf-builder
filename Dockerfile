@@ -54,13 +54,13 @@ RUN groupadd -g ${PDF_GRPID} ${PDF_GRP} \
   && chown -R ${PDF_USER}:${PDF_GRP} ${PDF_HOME} \
   && chown -R ${PDF_USER}:${PDF_GRP} ${WORKDIR}
 
-COPY show-usage.sh pdf-*.sh /usr/local/bin/
+COPY pdf-*.sh /usr/local/bin/
 
 # entrypoint 
-COPY docker-entrypoint.sh /
+COPY docker-entrypoint.sh docker-cmd.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["/usr/local/bin/show-usage.sh"]
+CMD ["/docker-cmd.sh"]
 
 USER ${PDF_USER}
 WORKDIR ${WORKDIR}
-VOLUME ["${PDF_HOME}", "${WORKDIR}"]
+VOLUME ["${PDF_HOME}"]
