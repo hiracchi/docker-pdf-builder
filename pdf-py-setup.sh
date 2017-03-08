@@ -2,7 +2,7 @@
 
 export LANG=C
 
-BRANCH=${BRANCH:-"master"}
+BRANCH=${BRANCH:-"develop"}
 
 checkout()
 {
