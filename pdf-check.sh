@@ -71,6 +71,5 @@ echo "checkout ..."
 checkout
 
 echo "run test..."
-make check_serial
-
+make check_serial_dev
 
