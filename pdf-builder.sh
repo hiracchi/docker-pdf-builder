@@ -1,6 +1,7 @@
 #!/bin/bash
 
 export LANG=C
+export LC_ALL=C
 
 # setup parameters =====================================================
 export PDF_HOME=${PDF_HOME:-"/usr/local/ProteinDF"}
@@ -33,6 +34,10 @@ for OPT in "$@"; do
             fi
             OPT_S="$2"
             shift 2
+            ;;
+
+        '--use-cmake')
+            OPT_CMAKE="yes"
             ;;
         
         '--'|'-')
@@ -90,7 +95,6 @@ export BLAS_LIBS="-lblas"
 export LAPACK_LIBS="-llapack"
 export SCALAPACK_LIBS="-lscalapack-openmpi -lblacs-openmpi -lblacsCinit-openmpi -lblacsF77init-openmpi -lblacs-openmpi"
 
-
 CONFIGURE_OPT=" \
  --prefix=${PDF_HOME} \
  --enable-parallel \
@@ -104,23 +108,36 @@ CONFIGURE_OPT=" \
 echo "install to PDF_HOME=${PDF_HOME}"
 echo "SRCDIR=${WORKDIR}"
 
-#cd ${SRCDIR}
-#if [ ! -f ${SRCDIR}/configure ]; then
-#rm -rf autom4te.cache
-#${SRCDIR}/bootstrap.sh
-#fi
-
 cp -a ${SRCDIR} ${TMP}/pdf
 cd ${TMP}/pdf
 
-rm -rf autom4te.cache
-${SRCDIR}/bootstrap.sh
+build-by-automake()
+{
+    rm -rf autom4te.cache
+    ${SRCDIR}/bootstrap.sh
+    
+    if [ x${OUT_OF_SOURCE} != x ]; then
+        mkdir -p ${OUT_OF_SOURCE}
+        cd ${OUT_OF_SOURCE}
+    fi
 
-if [ x${OUT_OF_SOURCE} != x ]; then
-    mkdir -p ${OUT_OF_SOURCE}
-    cd ${OUT_OF_SOURCE}
+    ./configure ${CONFIGURE_OPT} 
+    make -j 3 && make install 
+}
+
+build-by-cmake()
+{
+    mkdir build
+    cd build
+    cmake \
+        -DCMAKE_INSTALL_PREFIX=${PDF_HOME} \
+        -DSCALAPACK_LIBRARIES="${SCALAPACK_LIBS}" \
+        ..
+    make -j 3 && make install
+}
+
+if [ x${OPT_CMAKE} != xyes ]; then
+    build-by-automake
+else
+    build-by-cmake
 fi
-
-./configure ${CONFIGURE_OPT} 
-make -j 3 && make install 
-

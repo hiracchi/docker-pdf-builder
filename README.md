@@ -21,12 +21,12 @@ You may get ProteinDF execution files in the `/opt/ProteinDF` directory in the c
 ```bash
 #!/bin/bash
 
-PDF_RUNNER="pdfrunner"
+PDF_RUNNER="pdf-runner"
 
 docker rm -f ${PDF_RUNNER} 2>&1 > /dev/null
 docker run -d --name ${PDF_RUNNER} -v "${PWD}:/work" hiracchi/pdf-builder
 docker exec -it ${PDF_RUNNER} pdf-py-setup.sh --work /tmp --branch develop
 docker exec -it ${PDF_RUNNER} pdf-builder.sh -o /tmp/pdf
-docker exec -it ${PDF_RUNNER} pdf-check.sh --branch develop serial_devB
+docker exec -it ${PDF_RUNNER} pdf-check.sh --branch develop serial_dev
 ```
 
