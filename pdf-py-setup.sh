@@ -13,7 +13,7 @@ checkout()
     echo "repository: ${REPOSITORY}"
     echo "branch: ${BRANCH}"
 
-    git clone -b ${BRANCH} "${REPOSITORY}" .
+    git clone --depth 1 -b ${BRANCH} "${REPOSITORY}" .
 }
 
 
