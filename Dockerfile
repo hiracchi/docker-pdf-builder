@@ -30,6 +30,10 @@ RUN apt-get update \
   clinfo opencl-headers libclc-dev mesa-opencl-icd \
   libclblas-dev \
   \
+  hdf5-tools \
+  libhdf5-dev \
+  libhdf5-openmpi-dev \
+  \
   vim emacs less \
   \
   python3-dev python3-numpy python3-scipy python3-pandas \
@@ -38,6 +42,7 @@ RUN apt-get update \
   python3-jinja2 \
   python3-sklearn-lib \
   python3-requests python3-bs4 \
+  python3-h5py python3-hdf5storage \
   && apt-get clean && apt-get autoclean \
   && rm -rf /var/lib/apt/lists/* \
   && update-alternatives --config csh
@@ -45,6 +50,7 @@ RUN apt-get update \
 
 # building env for ProteinDF
 ENV PDF_HOME="${PDF_HOME}" PATH="${PATH}:${PDF_HOME}/bin" PYTHONPATH="${PDF_HOME}/lib/python3.5/site-packages"
+ENV WORKDIR="${WORKDIR}"
 RUN mkdir -p ${PDF_HOME} ${WORKDIR}
 
 RUN groupadd -g ${PDF_GRPID} ${PDF_GRP} \
@@ -56,7 +62,7 @@ RUN groupadd -g ${PDF_GRPID} ${PDF_GRP} \
 
 COPY pdf-*.sh /usr/local/bin/
 
-# entrypoint 
+# entrypoint
 COPY docker-entrypoint.sh docker-cmd.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["/docker-cmd.sh"]
