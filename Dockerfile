@@ -27,7 +27,7 @@ RUN apt-get update \
   liblapack-dev liblapacke-dev \
   openmpi-bin libopenmpi-dev \
   libblacs-mpi-dev libscalapack-mpi-dev \
-  clinfo opencl-headers libclc-dev mesa-opencl-icd=11.2.0-1ubuntu2 \
+  clinfo opencl-headers libclc-dev mesa-opencl-icd \
   libclblas-dev \
   \
   hdf5-tools \
@@ -67,6 +67,6 @@ COPY docker-entrypoint.sh docker-cmd.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["/docker-cmd.sh"]
 
-#`USER ${PDF_USER}
+USER ${PDF_USER}
 WORKDIR ${WORKDIR}
 VOLUME ["${PDF_HOME}"]
