@@ -7,6 +7,9 @@ BRANCH=develop
 build:
 	docker build -t "hiracchi/${PACKAGE}:latest" .
 
+build-develop:
+	docker build -t "hiracchi/${PACKAGE}:develop" .
+
 run:
 	docker run -d --rm \
 		--name ${PACKAGE} \

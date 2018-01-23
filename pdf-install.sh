@@ -2,8 +2,9 @@
 
 set -e # stop on error
 #set -u # inform undefined variables
-set -x # output command
+#set -x # output command
 
+TEMP=/tmp
 BRANCH="master"
 
 GITHUB_PROTEINDF="https://github.com/ProteinDF/ProteinDF.git"
@@ -43,8 +44,9 @@ git_clone()
     DEST=${DEST:-`pwd`}
 
     if [ -d "${DEST}" ]; then
-        echo "remove ${DEST} ..."
-        rm -rf "${DEST}"
+        echo "already exist: ${DEST}"
+        echo "stop to clone..."
+        return
     fi
 
     echo "cloning from ${REPOS} (${BRANCH}) to ${DEST} ..."
@@ -88,6 +90,7 @@ install_pdfpyapp()
 # option ==============================================================
 declare -a ARGV=()
 OPT_W=""
+OPT_CLONE_ONLY=""
 OPT_BRANCH=""
 OPT_CMAKE=""
 
@@ -100,6 +103,11 @@ for OPT in "$@"; do
             fi
             OPT_W="$2"
             shift 2
+            ;;
+
+        '--clone-only')
+            OPT_CLONE_ONLY="yes"
+            shift 1
             ;;
 
         '--branch')
@@ -137,6 +145,7 @@ ARGC=${#ARGV[@]}
 #echo "ARGC=${ARGC}"
 #echo "ARGV[@]=${ARGV[@]}"
 
+WORKDIR=""
 if [ -n "${OPT_W}" ]; then
     WORKDIR=${OPT_W}
 fi
@@ -147,34 +156,52 @@ fi
 
 
 # MAIN =================================================================
-WORKDIR=/tmp
-
 for CMD in ${ARGV[@]}; do
     case "${CMD}" in
         "pdf")
-            git_clone "${GITHUB_PROTEINDF}" "${BRANCH}" ${WORKDIR}/pdf
-            (cd ${WORKDIR}/pdf; \
-             if [ "x${OPT_CMAKE}" != "xyes" ]; then \
-                 install_pdf_by_automake; \
-             else \
-                 install_pdf_by_cmake; \
-             fi \
-             )
+            if [ "x${WORKDIR}" == x ]; then
+                WORKDIR=${TEMP}/pdf
+            fi
+            git_clone "${GITHUB_PROTEINDF}" "${BRANCH}" ${WORKDIR}
+            if [ "x${OPT_CLONE_ONLY}" != xyes ]; then
+                (cd ${WORKDIR}; \
+                 if [ "x${OPT_CMAKE}" != "xyes" ]; then \
+                     install_pdf_by_automake; \
+                 else \
+                     install_pdf_by_cmake; \
+                 fi \
+                )
+            fi
             ;;
 
         "pytools")
-            git_clone "${GITHUB_PROTEINDF_PYTOOLS}" "${BRANCH}" ${WORKDIR}/pdfpytools
-            (cd ${WORKDIR}/pdfpytools; install_pdfpyapp)
+            if [ "x${WORKDIR}" == x ]; then
+                WORKDIR=${TEMP}/pdfpytools
+            fi
+            git_clone "${GITHUB_PROTEINDF_PYTOOLS}" "${BRANCH}" ${WORKDIR}
+            if [ "x${OPT_CLONE_ONLY}" != xyes ]; then
+                (cd ${WORKDIR}; install_pdfpyapp)
+            fi
             ;;
 
         "bridge")
-            git_clone "${GITHUB_PROTEINDF_BRIDGE}" "${BRANCH}" ${WORKDIR}/pdfbridge
-            (cd ${WORKDIR}/pdfbridge; install_pdfpyapp)
+            if [ "x${WORKDIR}" == x ]; then
+                WORKDIR=${TEMP}/pdfbridge
+            fi
+            git_clone "${GITHUB_PROTEINDF_BRIDGE}" "${BRANCH}" ${WORKDIR}
+            if [ "x${OPT_CLONE_ONLY}" != xyes ]; then
+                (cd ${WORKDIR}; install_pdfpyapp)
+            fi
             ;;
 
         "qclobot")
-            git_clone "${GITHUB_QCLOBOT}" "${BRANCH}" ${WORKDIR}/qclobot
-            (cd ${WORKDIR}/qclobot; install_pdfpyapp)
+            if [ "x${WORKDIR}" == x ]; then
+                WORKDIR=${TEMP}/qclobot
+            fi
+            git_clone "${GITHUB_QCLOBOT}" "${BRANCH}" ${WORKDIR}
+            if [ "x${OPT_CLONE_ONLY}" != xyes ]; then
+                (cd ${WORKDIR}; install_pdfpyapp)
+            fi
             ;;
 
         *)

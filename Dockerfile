@@ -48,7 +48,13 @@ RUN apt-get update \
   && update-alternatives --config csh
 
 
-# building env for ProteinDF
+RUN apt-get update \
+  && apt-get install -y \
+  sudo \
+  && apt-get clean && apt-get autoclean
+
+
+# building env for ProteinDF ===========================================
 ENV PDF_HOME="${PDF_HOME}" PATH="${PATH}:${PDF_HOME}/bin" PYTHONPATH="${PDF_HOME}/lib/python3.5/site-packages"
 ENV WORKDIR="${WORKDIR}"
 RUN mkdir -p ${PDF_HOME} ${WORKDIR}
@@ -62,7 +68,7 @@ RUN groupadd -g ${PDF_GRPID} ${PDF_GRP} \
 
 COPY pdf-*.sh /usr/local/bin/
 
-# entrypoint
+# entrypoint ===========================================================
 COPY docker-entrypoint.sh docker-cmd.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["/docker-cmd.sh"]
