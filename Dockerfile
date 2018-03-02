@@ -20,6 +20,7 @@ ARG PDF_USERID=56670
 # packages =============================================================
 RUN apt-get update \
   && apt-get install -y \
+  sudo \
   tcsh zsh \
   build-essential ca-certificates \
   git automake autoconf libtool cmake \
@@ -52,14 +53,8 @@ RUN apt-get update \
   && update-alternatives --config csh
 
 
-RUN apt-get update \
-  && apt-get install -y \
-  sudo \
-  && apt-get clean && apt-get autoclean
-
-
 # building env for ProteinDF ===========================================
-ENV PDF_HOME="${PDF_HOME}" PATH="${PATH}:${PDF_HOME}/bin" 
+ENV PDF_HOME="${PDF_HOME}" PATH="${PATH}:${PDF_HOME}/bin"
 ENV WORKDIR="${WORKDIR}"
 RUN mkdir -p ${PDF_HOME} ${WORKDIR}
 

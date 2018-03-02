@@ -5,6 +5,8 @@ if [ -f env.sh ]; then
     source env.sh
 fi
 
+WORKDIR=.
+
 UNBUFFER=
 if [ `which unbuffer` ]; then
     UNBUFFER="unbuffer"
@@ -90,6 +92,15 @@ for OPT in "$@"; do
             CMAKE_VERBOSE_MAKEFILE="1"
             ;;
 
+        '-w'|'--workdir')
+            if [[ -z "${2}" ]] || [[ "${2}" =~ ^-+ ]]; then
+                echo "$PROGNAME: option requires an argument -- ${1}" 1>&2
+                exit 1
+            fi
+            WORKDIR="$2"
+            shift 2
+            ;;
+
         '--'|'-')
             shift 1
             ARGV+=( "$@" )
@@ -116,6 +127,8 @@ ARGC=${#ARGV[@]}
 # ======================================================================
 # MAIN
 # ======================================================================
+cd ${WORKDIR}
+
 if [ "x${PDF_HOME}" = x ]; then
    echo "environment variable \"PDF_HOME\" is not set. stop."
    exit 1

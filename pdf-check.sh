@@ -32,8 +32,8 @@ for OPT in "$@"; do
             OPT_B="$2"
             shift 2
             ;;
-        
-        '-w'|'--work')
+
+        '-w'|'--workdir')
             if [[ -z "${2}" ]] || [[ "${2}" =~ ^-+ ]]; then
                 echo "$PROGNAME: option requires an argument -- ${1}" 1>&2
                 exit 1
@@ -41,7 +41,7 @@ for OPT in "$@"; do
             OPT_W="$2"
             shift 2
             ;;
-        
+
         '--'|'-')
             shift 1
             param+=( "$@" )
@@ -80,6 +80,5 @@ checkout
 
 for i in ${param[@]}; do
     echo "run test (check_${i})..."
-    PDF_TEST_ARGS="--simple" make check_${i}
+    make check_${i}
 done
-
