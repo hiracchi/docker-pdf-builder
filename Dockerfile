@@ -59,7 +59,7 @@ RUN apt-get update \
 
 
 # building env for ProteinDF ===========================================
-ENV PDF_HOME="${PDF_HOME}" PATH="${PATH}:${PDF_HOME}/bin" PYTHONPATH="${PDF_HOME}/lib/python3.5/site-packages"
+ENV PDF_HOME="${PDF_HOME}" PATH="${PATH}:${PDF_HOME}/bin" 
 ENV WORKDIR="${WORKDIR}"
 RUN mkdir -p ${PDF_HOME} ${WORKDIR}
 
