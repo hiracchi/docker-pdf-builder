@@ -10,7 +10,7 @@ build:
 build-develop:
 	docker build -t "hiracchi/${PACKAGE}:develop" .
 
-run:
+start:
 	docker run -d --rm \
 		--name ${PACKAGE} \
 		"hiracchi/${PACKAGE}:${PDF_BUILDER_VER}"
