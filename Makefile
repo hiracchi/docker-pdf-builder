@@ -1,19 +1,17 @@
 PACKAGE=pdf-builder
-PDF_BUILDER_VER=latest
-BRANCH=develop
+TAG=latest
+BRANCH=master
 
 .PHONY: build run exec
 
 build:
-	docker build -t "hiracchi/${PACKAGE}:latest" .
+	docker build -t "hiracchi/${PACKAGE}:${TAG}" .
 
-build-develop:
-	docker build -t "hiracchi/${PACKAGE}:develop" .
 
 start:
 	docker run -d --rm \
 		--name ${PACKAGE} \
-		"hiracchi/${PACKAGE}:${PDF_BUILDER_VER}"
+		"hiracchi/${PACKAGE}:${TAG}"
 
 stop:
 	docker rm -f ${PACKAGE}

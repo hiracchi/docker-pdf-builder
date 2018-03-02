@@ -15,7 +15,12 @@ fi
 # ======================================================================
 setup_pytools()
 {
-    pip install --upgrade .
+    PIP_CMD="pip"
+    if type pip3 2>&1 > /dev/null; then
+        PIP_CMD="pip3"
+    fi
+
+    eval "${PIP_CMD} install --upgrade ."
 }
 
 

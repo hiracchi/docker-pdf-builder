@@ -36,7 +36,11 @@ RUN apt-get update \
   \
   vim emacs less \
   \
-  python3-dev python3-numpy python3-scipy python3-pandas \
+  python-dev python-pip \
+  curl openssl libssl-dev libbz2-dev libreadline-dev libsqlite3-dev \
+  \
+  python3-dev python3-pip \
+  python3-numpy python3-scipy python3-pandas \
   python3-matplotlib \
   python3-yaml python3-msgpack \
   python3-jinja2 \
@@ -60,7 +64,7 @@ ENV WORKDIR="${WORKDIR}"
 RUN mkdir -p ${PDF_HOME} ${WORKDIR}
 
 RUN groupadd -g ${PDF_GRPID} ${PDF_GRP} \
-  && useradd -u ${PDF_USERID} -g ${PDF_GRP} -d /home/${PDF_USER} -s /sbin/nologin ${PDF_USER} \
+  && useradd -u ${PDF_USERID} -g ${PDF_GRP} -d /home/${PDF_USER} -s /bin/bash ${PDF_USER} \
   && mkdir -p /home/${PDF_USER} \
   && chown -R ${PDF_USER}:${PDF_GRP} /home/${PDF_USER} \
   && chown -R ${PDF_USER}:${PDF_GRP} ${PDF_HOME} \
@@ -74,5 +78,16 @@ ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["/docker-cmd.sh"]
 
 USER ${PDF_USER}
+WORKDIR /home/${PDF_USER}
+ENV HOME /home/${PDF_USER}
+RUN set -x \
+  && git clone "git://github.com/yyuu/pyenv.git" .pyenv
+ENV PYENV_ROOT ${HOME}/.pyenv
+ENV PATH ${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:$PATH
+RUN set -x \
+  && pyenv install 2.7.12 \
+  && pyenv install 3.6.4 \
+  && pyenv global 3.6.4
+
 WORKDIR ${WORKDIR}
 VOLUME ["${PDF_HOME}"]
