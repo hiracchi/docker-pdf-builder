@@ -65,13 +65,9 @@ RUN groupadd -g ${PDF_GRPID} ${PDF_GRP} \
   && chown -R ${PDF_USER}:${PDF_GRP} ${PDF_HOME} \
   && chown -R ${PDF_USER}:${PDF_GRP} ${WORKDIR}
 
-COPY pdf-*.sh /usr/local/bin/
+COPY pdf-*.sh env2cmake.py /usr/local/bin/
 
 # entrypoint ===========================================================
-COPY docker-entrypoint.sh docker-cmd.sh /
-ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["/docker-cmd.sh"]
-
 USER ${PDF_USER}
 WORKDIR /home/${PDF_USER}
 ENV HOME /home/${PDF_USER}
@@ -84,5 +80,11 @@ RUN set -x \
   && pyenv install 3.6.4 \
   && pyenv global 3.6.4
 
+USER root
+COPY docker-*.sh /usr/local/bin/
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["/usr/local/bin/docker-cmd.sh"]
+
+USER ${PDF_USER}
 WORKDIR ${WORKDIR}
 VOLUME ["${PDF_HOME}"]
