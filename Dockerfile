@@ -31,6 +31,8 @@ RUN apt-get update \
   clinfo opencl-headers libclc-dev mesa-opencl-icd \
   libclblas-dev \
   \
+  libeigen3-dev \
+  \
   hdf5-tools \
   libhdf5-dev \
   libhdf5-openmpi-dev \
