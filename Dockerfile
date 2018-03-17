@@ -54,6 +54,14 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/* \
   && update-alternatives --config csh
 
+# google-test ==========================================================
+RUN cd /tmp \
+  && git clone "https://github.com/google/googletest.git" \
+  && mkdir -p /tmp/googletest/build \
+  && cd /tmp/googletest/build \
+  && cmake .. \
+  && make \
+  && make install
 
 # building env for ProteinDF ===========================================
 ENV PDF_HOME="${PDF_HOME}" PATH="${PATH}:${PDF_HOME}/bin"
@@ -69,10 +77,12 @@ RUN groupadd -g ${PDF_GRPID} ${PDF_GRP} \
 
 COPY pdf-*.sh env2cmake.py /usr/local/bin/
 
-# entrypoint ===========================================================
+# account ==============================================================
 USER ${PDF_USER}
 WORKDIR /home/${PDF_USER}
 ENV HOME /home/${PDF_USER}
+
+# Python ===============================================================
 RUN set -x \
   && git clone "git://github.com/yyuu/pyenv.git" .pyenv
 ENV PYENV_ROOT ${HOME}/.pyenv
@@ -82,6 +92,7 @@ RUN set -x \
   && pyenv install 3.6.4 \
   && pyenv global 3.6.4
 
+# entrypoint ===========================================================
 USER root
 COPY docker-*.sh /usr/local/bin/
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
