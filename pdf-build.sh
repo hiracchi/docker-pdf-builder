@@ -1,12 +1,9 @@
 #!/bin/bash
 # set -eux
+umask 0000
 
-if [ -f env.sh ]; then
-    source env.sh
-fi
-
-WORKDIR=.
-
+SRCDIR=`pwd`
+WORKDIR=/tmp
 UNBUFFER=
 if [ `which unbuffer` ]; then
     UNBUFFER="unbuffer"
@@ -29,15 +26,15 @@ setup_pytools()
 # cmake版
 build_pdf_cmake()
 {
-    if [ -d build ]; then
-        rm -rf build
+    if [ -d "${WORKDIR}/build" ]; then
+        rm -rf "${WORKDIR}/build"
     fi
-    mkdir build
-    cd build
+    mkdir -p "${WORKDIR}/build"
+    cd "${WORKDIR}/build"
 
     # cmake setup
     CMAKE_ENV_OPTS=`env2cmake.py`
-    eval "cmake -DCMAKE_INSTALL_PREFIX=\"${PDF_HOME}\" ${CMAKE_ENV_OPTS}" .. 2>&1 | tee out.cmake
+    eval "cmake -DCMAKE_INSTALL_PREFIX=\"${PDF_HOME}\" ${CMAKE_ENV_OPTS}" "${SRCDIR}" 2>&1 | tee out.cmake
 
     ${UNBUFFER} make 2>&1 | tee out.make
     ${UNBUFFER} make install 2>&1 | tee out.make_install
@@ -92,6 +89,15 @@ for OPT in "$@"; do
             CMAKE_VERBOSE_MAKEFILE="1"
             ;;
 
+        '-s'|'--srcdir')
+            if [[ -z "${2}" ]] || [[ "${2}" =~ ^-+ ]]; then
+                echo "$PROGNAME: option requires an argument -- ${1}" 1>&2
+                exit 1
+            fi
+            SRCDIR="$2"
+            shift 2
+            ;;
+
         '-w'|'--workdir')
             if [[ -z "${2}" ]] || [[ "${2}" =~ ^-+ ]]; then
                 echo "$PROGNAME: option requires an argument -- ${1}" 1>&2
@@ -127,7 +133,7 @@ ARGC=${#ARGV[@]}
 # ======================================================================
 # MAIN
 # ======================================================================
-cd ${WORKDIR}
+cd ${SRCDIR}
 
 if [ "x${PDF_HOME}" = x ]; then
    echo "environment variable \"PDF_HOME\" is not set. stop."

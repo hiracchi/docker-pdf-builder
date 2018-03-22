@@ -1,5 +1,7 @@
 #!/bin/bash
 
+umask 0000
+
 BRANCH=master
 TEST_BRANCH=master
 
@@ -73,9 +75,9 @@ ARGC=${#ARGV[@]}
 pdf-checkout.sh --branch ${BRANCH} ProteinDF_bridge
 pdf-checkout.sh --branch ${BRANCH} ProteinDF_pytools
 
-pdf-build.sh --workdir /work/ProteinDF # mounted by docker
-pdf-build.sh --workdir /work/ProteinDF_bridge
-pdf-build.sh --workdir /work/ProteinDF_pytools
+pdf-build.sh --srcdir /work/ProteinDF # mounted by docker
+pdf-build.sh --srcdir /work/ProteinDF_bridge
+pdf-build.sh --srcdir /work/ProteinDF_pytools
 
 
 # run test --
