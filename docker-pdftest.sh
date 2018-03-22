@@ -1,6 +1,7 @@
 #!/bin/bash
 
 BRANCH=master
+TEST_BRANCH=master
 
 # ======================================================================
 # option
@@ -22,12 +23,21 @@ for OPT in "$@"; do
             CMAKE_VERBOSE_MAKEFILE="1"
             ;;
 
-        '-w'|'--test-branch')
+        '-b'|'--branch')
             if [[ -z "${2}" ]] || [[ "${2}" =~ ^-+ ]]; then
                 echo "$PROGNAME: option requires an argument -- ${1}" 1>&2
                 exit 1
             fi
             BRANCH="$2"
+            shift 2
+            ;;
+
+        '-t'|'--test-branch')
+            if [[ -z "${2}" ]] || [[ "${2}" =~ ^-+ ]]; then
+                echo "$PROGNAME: option requires an argument -- ${1}" 1>&2
+                exit 1
+            fi
+            TEST_BRANCH="$2"
             shift 2
             ;;
 
@@ -72,6 +82,6 @@ pdf-build.sh --workdir /work/ProteinDF_pytools
 # TARGET = serial, serial_dev, etc.
 for TARGET in ${ARGV[@]}; do
     echo ">>>> ${TARGET}"
-    pdf-check.sh -w /work/pdf-test --branch ${BRANCH} ${TARGET}
+    pdf-check.sh -w /work/pdf-test --branch ${TEST_BRANCH} ${TARGET}
     echo "Done."
 done
