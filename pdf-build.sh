@@ -4,6 +4,7 @@ umask 0000
 
 SRCDIR=`pwd`
 WORKDIR=/tmp
+NCPUS=3
 UNBUFFER=
 if [ `which unbuffer` ]; then
     UNBUFFER="unbuffer"
@@ -36,7 +37,7 @@ build_pdf_cmake()
     CMAKE_ENV_OPTS=`env2cmake.py`
     eval "cmake -DCMAKE_INSTALL_PREFIX=\"${PDF_HOME}\" ${CMAKE_ENV_OPTS}" "${SRCDIR}" 2>&1 | tee out.cmake
 
-    ${UNBUFFER} make 2>&1 | tee out.make
+    ${UNBUFFER} make -j ${NCPUS} 2>&1 | tee out.make
     ${UNBUFFER} make install 2>&1 | tee out.make_install
 }
 
