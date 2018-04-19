@@ -17,7 +17,7 @@ checkout()
     echo "repository: ${REPOSITORY}"
     echo "branch: ${BRANCH}"
 
-    git clone -b ${BRANCH} "${REPOSITORY}" .
+    git clone -b ${BRANCH} "${REPOSITORY}" 
 }
 
 
@@ -78,6 +78,7 @@ cd ${WORKDIR}
 echo "checkout ..."
 checkout
 
+cd ${WORKDIR}/ProteinDF_test
 for i in ${param[@]}; do
     echo "run test (check_${i})..."
     make check_${i}

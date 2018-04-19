@@ -20,7 +20,7 @@ setup_pytools()
         PIP_CMD="pip3"
     fi
 
-    eval "${PIP_CMD} install --upgrade ."
+    eval "${PIP_CMD} install --upgrade ${SRCDIR}"
 }
 
 
@@ -134,7 +134,12 @@ ARGC=${#ARGV[@]}
 # ======================================================================
 # MAIN
 # ======================================================================
-cd ${SRCDIR}
+if [ x${WORKDIR} != x ]; then
+    cd ${WORKDIR}
+fi
+echo "WORKDIR=${WORKDIR}"
+
+echo "SRCDIR=${SRCDIR}"
 
 if [ "x${PDF_HOME}" = x ]; then
    echo "environment variable \"PDF_HOME\" is not set. stop."
@@ -143,16 +148,17 @@ fi
 echo "PDF_HOME=${PDF_HOME}"
 
 
-if [ -f setup.py ]; then
+if [ -f ${SRCDIR}/setup.py ]; then
     echo "build python application ..."
     setup_pytools
-elif [ -f CMakeLists.txt ]; then
+elif [ -f ${SRCDIR}/CMakeLists.txt ]; then
     echo "build by using CMake ..."
     build_pdf_cmake
-elif [ -f bootstrap.sh -o -f configure ]; then
+elif [ -f ${SRCDIR}/bootstrap.sh -o -f configure ]; then
     echo "build by using automake ..."
     build_pdf_configure
 else
     echo "cannot find how to build. stop."
     exit 1
 fi
+
