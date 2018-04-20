@@ -14,10 +14,15 @@ WORKDIR=${WORKDIR:-"${TMP}/pdftest"}
 # checkout ============================================================
 checkout()
 {
+    WORKDIR="."
+    if [ x${1} != x ]; then
+        WORKDIR="${1}"
+    fi
     echo "repository: ${REPOSITORY}"
     echo "branch: ${BRANCH}"
+    echo "WORKDIR: ${WORKDIR}"
 
-    git clone -b ${BRANCH} "${REPOSITORY}" 
+    git clone -b ${BRANCH} "${REPOSITORY}" "${WORKDIR}"
 }
 
 
@@ -70,16 +75,16 @@ fi
 # do test ==============================================================
 echo "PDF_HOME=${PDF_HOME}"
 echo "test workdir: ${WORKDIR}"
-if [ ! -d ${WORKDIR} ]; then
-    mkdir -p ${WORKDIR}
+if [ -d ${WORKDIR} ]; then
+    rm -rf ${WORKDIR}
 fi
-cd ${WORKDIR}
 
 echo "checkout ..."
 checkout
 
-cd ${WORKDIR}/ProteinDF_test
+cd "${WORKDIR}"
 for i in ${param[@]}; do
     echo "run test (check_${i})..."
     make check_${i}
 done
+

@@ -75,8 +75,6 @@ RUN groupadd -g ${PDF_GRPID} ${PDF_GRP} \
   && chown -R ${PDF_USER}:${PDF_GRP} ${PDF_HOME} \
   && chown -R ${PDF_USER}:${PDF_GRP} ${WORKDIR}
 
-COPY pdf-*.sh env2cmake.py /usr/local/bin/
-
 # account ==============================================================
 USER ${PDF_USER}
 WORKDIR /home/${PDF_USER}
@@ -94,7 +92,7 @@ RUN set -x \
 
 # entrypoint ===========================================================
 USER root
-COPY docker-*.sh /usr/local/bin/
+COPY docker-*.sh pdf-*.sh env2cmake.py /usr/local/bin/
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["/usr/local/bin/docker-cmd.sh"]
 
