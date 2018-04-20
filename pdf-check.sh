@@ -80,7 +80,7 @@ if [ -d ${WORKDIR} ]; then
 fi
 
 echo "checkout ..."
-checkout
+checkout ${WORKDIR}
 
 cd "${WORKDIR}"
 for i in ${param[@]}; do
