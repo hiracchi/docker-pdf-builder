@@ -14,10 +14,16 @@ WORKDIR=${WORKDIR:-"${TMP}/pdftest"}
 # checkout ============================================================
 checkout()
 {
-    echo "repository: ${REPOSITORY}"
-    echo "branch: ${BRANCH}"
+    WORKDIR="."
+    if [ "x${1}" != x ]; then
+        WORKDIR="${1}"
+    fi
+    echo "checkout ..."
+    echo "  repository: ${REPOSITORY}"
+    echo "  branch: ${BRANCH}"
+    echo "  WORKDIR: ${WORKDIR}"
 
-    git clone -b ${BRANCH} "${REPOSITORY}" .
+    git clone -b ${BRANCH} "${REPOSITORY}" "${WORKDIR}"
 }
 
 
@@ -32,8 +38,8 @@ for OPT in "$@"; do
             OPT_B="$2"
             shift 2
             ;;
-        
-        '-w'|'--work')
+
+        '-w'|'--workdir')
             if [[ -z "${2}" ]] || [[ "${2}" =~ ^-+ ]]; then
                 echo "$PROGNAME: option requires an argument -- ${1}" 1>&2
                 exit 1
@@ -41,7 +47,7 @@ for OPT in "$@"; do
             OPT_W="$2"
             shift 2
             ;;
-        
+
         '--'|'-')
             shift 1
             param+=( "$@" )
@@ -68,18 +74,17 @@ if [ -n "${OPT_W}" ]; then
 fi
 
 # do test ==============================================================
-echo "PDF_HOME=${PDF_HOME}"
-echo "test workdir: ${WORKDIR}"
-if [ ! -d ${WORKDIR} ]; then
-    mkdir -p ${WORKDIR}
+echo ">>>> pdf-check"
+echo "  PDF_HOME=${PDF_HOME}"
+echo "  WORKDIR: ${WORKDIR}"
+if [ -d ${WORKDIR} ]; then
+    rm -rf ${WORKDIR}
 fi
-cd ${WORKDIR}
 
-echo "checkout ..."
-checkout
+checkout ${WORKDIR}
 
+cd "${WORKDIR}"
 for i in ${param[@]}; do
     echo "run test (check_${i})..."
-    PDF_TEST_ARGS="--simple" make check_${i}
+    make check_${i}
 done
-
