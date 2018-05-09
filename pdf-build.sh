@@ -1,14 +1,19 @@
 #!/bin/bash
 # set -eux
+set -o pipefail
+
 umask 0000
 
 SRCDIR=`pwd`
 WORKDIR=/tmp
 NCPUS=3
+
 UNBUFFER=
 if [ `which unbuffer` ]; then
     UNBUFFER="unbuffer"
 fi
+
+CONFIGURE_ONLY=no
 
 # ======================================================================
 # FUNCTIONS
@@ -34,11 +39,17 @@ build_pdf_cmake()
     cd "${WORKDIR}/build"
 
     # cmake setup
-    CMAKE_ENV_OPTS=`env2cmake.py`
+    CMAKE_ENV_OPTS=""
+    if [ `which env2cmake.py` ]; then
+        CMAKE_ENV_OPTS=`env2cmake.py`
+    fi
     eval "cmake -DCMAKE_INSTALL_PREFIX=\"${PDF_HOME}\" ${CMAKE_ENV_OPTS}" "${SRCDIR}" 2>&1 | tee out.cmake
 
-    ${UNBUFFER} make -j ${NCPUS} 2>&1 | tee out.make
-    ${UNBUFFER} make install 2>&1 | tee out.make_install
+    if [ "x${CONFIGURE_ONLY}" != "xyes" ]; then
+        ${UNBUFFER} make -j ${NCPUS} 2>&1 | tee out.make
+        ${UNBUFFER} make install 2>&1 | tee out.make_install
+        ${UNBUFFER} make test ARGS="--verbose" test 2>&1 | tee out.make_test
+    fi
 }
 
 
@@ -134,10 +145,11 @@ ARGC=${#ARGV[@]}
 # ======================================================================
 # MAIN
 # ======================================================================
+echo ">>>> pdf-build script:"
+echo "WORKDIR=${WORKDIR}"
 if [ x${WORKDIR} != x ]; then
     cd ${WORKDIR}
 fi
-echo "WORKDIR=${WORKDIR}"
 
 echo "SRCDIR=${SRCDIR}"
 
@@ -162,3 +174,5 @@ else
     exit 1
 fi
 
+echo "done."
+echo
