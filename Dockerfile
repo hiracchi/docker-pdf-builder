@@ -64,7 +64,8 @@ RUN cd /tmp \
   && make install
 
 # building env for ProteinDF ===========================================
-ENV PDF_HOME="${PDF_HOME}" PATH="${PATH}:${PDF_HOME}/bin"
+ENV PDF_HOME="${PDF_HOME}"
+ENV PATH="${PATH}:${PDF_HOME}/bin"
 ENV WORKDIR="${WORKDIR}"
 RUN mkdir -p ${PDF_HOME} ${WORKDIR}
 
