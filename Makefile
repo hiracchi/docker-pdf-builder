@@ -1,5 +1,5 @@
 PACKAGE=pdf-builder
-TAG=latest
+TAG=develop
 BRANCH=master
 
 .PHONY: build run exec

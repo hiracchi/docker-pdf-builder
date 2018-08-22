@@ -1,5 +1,5 @@
-FROM ubuntu:16.04
-MAINTAINER Toshiyuki HIRANO <hiracchi@gmail.com>
+FROM ubuntu:18.04
+LABEL  maintainer "Toshiyuki HIRANO <hiracchi@gmail.com>"
 
 ARG BUILD_DATE
 ARG VCS_REF
@@ -8,6 +8,8 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.vcs-url="https://github.com/hiracchi/docker-pdf-builder" \
       org.label-schema.version=$VERSION
+
+ENV DEBIAN_FRONTEND="noninteractive"
 
 ARG PDF_HOME="/opt/ProteinDF"
 ARG WORKDIR="/work"
@@ -22,15 +24,17 @@ RUN apt-get update \
   && apt-get install -y \
   sudo \
   tcsh zsh \
-  build-essential ca-certificates \
+  build-essential curl ca-certificates \
   git automake autoconf libtool cmake \
-  libopenblas-dev libatlas-dev \
+  libopenblas-dev \
+  libatlas-base-dev \
   liblapack-dev liblapacke-dev \
   openmpi-bin libopenmpi-dev \
   libblacs-mpi-dev libscalapack-mpi-dev \
   clinfo opencl-headers libclc-dev mesa-opencl-icd \
   libclblas-dev \
   \
+  libboost-all-dev \
   libeigen3-dev \
   \
   hdf5-tools \
@@ -39,9 +43,9 @@ RUN apt-get update \
   \
   vim emacs less \
   \
-  python-dev python-pip \
-  curl openssl libssl-dev libbz2-dev libreadline-dev libsqlite3-dev \
+  openssl libssl-dev libbz2-dev libreadline-dev libsqlite3-dev \
   \
+  python-dev python-pip \
   python3-dev python3-pip \
   python3-numpy python3-scipy python3-pandas \
   python3-matplotlib \
@@ -54,8 +58,19 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/* \
   && update-alternatives --config csh
 
+# viennacl-dev =========================================================
+RUN set -x \
+  && cd /tmp \
+  && git clone "https://github.com/viennacl/viennacl-dev.git" \
+  && mkdir -p /tmp/viennacl-dev/build \
+  && cd /tmp/viennacl-dev/build \
+  && cmake .. \
+  && make \
+  && make install
+
 # google-test ==========================================================
-RUN cd /tmp \
+RUN set -x \
+  && cd /tmp \
   && git clone "https://github.com/google/googletest.git" \
   && mkdir -p /tmp/googletest/build \
   && cd /tmp/googletest/build \
@@ -82,20 +97,20 @@ WORKDIR /home/${PDF_USER}
 ENV HOME /home/${PDF_USER}
 
 # Python ===============================================================
-RUN set -x \
-  && git clone "git://github.com/yyuu/pyenv.git" .pyenv
-ENV PYENV_ROOT ${HOME}/.pyenv
-ENV PATH ${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:$PATH
-RUN set -x \
-  && pyenv install 2.7.12 \
-  && pyenv install 3.6.4 \
-  && pyenv global 3.6.4
+#RUN set -x \
+#  && git clone "git://github.com/yyuu/pyenv.git" .pyenv
+#ENV PYENV_ROOT ${HOME}/.pyenv
+#ENV PATH ${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:$PATH
+#RUN set -x \
+#  && pyenv install 2.7.12 \
+#  && pyenv install 3.6.4 \
+#  && pyenv global 3.6.4
 
 # entrypoint ===========================================================
 USER root
 COPY docker-*.sh pdf-*.sh env2cmake.py /usr/local/bin/
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-CMD ["/usr/local/bin/docker-cmd.sh"]
+#CMD ["/usr/local/bin/docker-cmd.sh"]
 
 USER ${PDF_USER}
 WORKDIR ${WORKDIR}
