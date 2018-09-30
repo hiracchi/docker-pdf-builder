@@ -66,15 +66,17 @@ fi
 
 
 # MAIN =================================================================
+if [ "x${WORKDIR}" == x ]; then
+    WORKDIR=${TEMP}
+fi
+echo "WORKDIR=${WORKDIR}"
+
 for CMD in ${ARGV[@]}; do
     case "${CMD}" in
         "ProteinDF" | "ProteinDF_bridge" | "ProteinDF_pytools" | "QCLObot")
-            if [ "x${WORKDIR}" == x ]; then
-                WORKDIR=${TEMP}
-            fi
             (cd ${WORKDIR}; \
-             pdf-checkout.sh ${CMD} --branch ${BRANCH}; \
-             pdf-build.sh \
+             pdf-checkout.sh --branch ${BRANCH} ${CMD}; \
+             cd ${WORKDIR}/${CMD}; pdf-build.sh \
              )
             ;;
 
