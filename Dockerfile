@@ -10,6 +10,8 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
       maintainer="Toshiyuki Hirano <hiracchi@gmail.com>"
 
 
+ENV DEBIAN_FRONTEND="noninteractive"
+
 ARG PDF_HOME="/opt/ProteinDF"
 ARG WORKDIR="/work"
 
@@ -49,8 +51,19 @@ RUN apt-get update \
 #  python-dev python-pip \
 #  curl openssl libssl-dev libbz2-dev libreadline-dev libsqlite3-dev \
 
+# viennacl-dev =========================================================
+RUN set -x \
+  && cd /tmp \
+  && git clone "https://github.com/viennacl/viennacl-dev.git" \
+  && mkdir -p /tmp/viennacl-dev/build \
+  && cd /tmp/viennacl-dev/build \
+  && cmake .. \
+  && make \
+  && make install
+
 # google-test ==========================================================
-RUN cd /tmp \
+RUN set -x \
+  && cd /tmp \
   && git clone "https://github.com/google/googletest.git" \
   && mkdir -p /tmp/googletest/build \
   && cd /tmp/googletest/build \
@@ -79,7 +92,7 @@ RUN cd /tmp \
 USER root
 COPY docker-*.sh pdf-*.sh env2cmake.py /usr/local/bin/
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-CMD ["/usr/local/bin/docker-cmd.sh"]
+#CMD ["/usr/local/bin/docker-cmd.sh"]
 
 # building env for ProteinDF ===========================================
 RUN set -x \
