@@ -33,6 +33,7 @@ RUN apt-get update \
   libclblas-dev \
   libeigen3-dev \
   clinfo opencl-headers libclc-dev mesa-opencl-icd \
+  libboost-all-dev \
   hdf5-tools \
   libhdf5-dev \
   libhdf5-openmpi-dev \
