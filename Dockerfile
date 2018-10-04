@@ -109,10 +109,10 @@ RUN set -x \
 # account ==============================================================
 USER ${PDF_USER}
 WORKDIR ${WORKDIR}
-ENV PDF_HOME="${PDF_HOME}"
+ENV PDF_HOME="${PDF_HOME}" 
+ENV PATH="${PATH}:${PDF_HOME}/bin"
 
 #WORKDIR /home/${PDF_USER}
 #ENV HOME /home/${PDF_USER}
 #VOLUME ["${PDF_HOME}"]
-#ENV PATH="${PATH}:${PDF_HOME}/bin"
 #ENV WORKDIR="${WORKDIR}"
