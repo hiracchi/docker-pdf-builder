@@ -45,7 +45,7 @@ clone()
 
     NAME_UPPERCASE=`echo ${NAME} | tr '[a-z]' '[A-Z]'`
     HOST_UPPERCASE=`echo ${HOST} | tr '[a-z]' '[A-Z]'`
-    HOST_LOWERCASE=`echo ${HOST} | tr '[A-Z]' '[a-z]'` 
+    HOST_LOWERCASE=`echo ${HOST} | tr '[A-Z]' '[a-z]'`
     REPOS=`eval echo '$'${HOST_UPPERCASE}_${NAME_UPPERCASE}`
 
     if [ x"${BRANCH}" = x ]; then
@@ -62,9 +62,9 @@ clone()
 }
 
 
-init_gitflow() 
+init_gitflow()
 {
-    cd ${NAME}; 
+    cd ${NAME};
     git fetch --all --prune;
     git flow init -df;
 }
@@ -98,7 +98,7 @@ checkout_branch()
 
     (cd ${NAME}; \
      git checkout ${BRANCH}; \
-     git branch -u ${HOST}/develop; \
+     git branch -u ${HOST}/${BRANCH}; \
      git pull --rebase;
     )
 }
