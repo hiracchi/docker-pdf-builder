@@ -9,16 +9,9 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.version=$VERSION \
       maintainer="Toshiyuki Hirano <hiracchi@gmail.com>"
 
-
-ENV DEBIAN_FRONTEND="noninteractive"
-
 ARG PDF_HOME="/opt/ProteinDF"
 ARG WORKDIR="/work"
 
-ARG PDF_GRP=pdf
-ARG PDF_GRPID=56670
-ARG PDF_USER=pdf
-ARG PDF_USERID=56670
 
 # packages =============================================================
 RUN apt-get update \
@@ -49,8 +42,6 @@ RUN apt-get update \
   && apt-get clean && apt-get autoclean \
   && rm -rf /var/lib/apt/lists/*
 
-#  python-dev python-pip \
-#  curl openssl libssl-dev libbz2-dev libreadline-dev libsqlite3-dev \
 
 # viennacl-dev =========================================================
 RUN set -x \
@@ -61,6 +52,7 @@ RUN set -x \
   && cmake .. \
   && make \
   && make install
+
 
 # google-test ==========================================================
 RUN set -x \
@@ -73,46 +65,10 @@ RUN set -x \
   && make install \
   && rm -rf /tmp/googletest
 
-# Python ===============================================================
-#RUN set -x \
-#  && git clone "git://github.com/yyuu/pyenv.git" .pyenv
-#ENV PYENV_ROOT ${HOME}/.pyenv
-#ENV PATH ${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:$PATH
-#RUN set -x \
-#  && pyenv install 2.7.12 \
-#  && pyenv install 3.6.4 \
-#  && pyenv global 3.6.4
-#COPY requires.txt /tmp
-#RUN set -x \
-#  && apt-get update \
-#  && apt-get install -y python-cairo
-#RUN set -x \
-#  && pip3 install -r /tmp/requires.txt
 
 # entrypoint ===========================================================
-USER root
 COPY docker-*.sh pdf-*.sh env2cmake.py /usr/local/bin/
+WORKDIR ${WORKDIR}
+ENV PDF_HOME="${PDF_HOME}" PATH="${PATH}:${PDF_HOME}/bin"
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 #CMD ["/usr/local/bin/docker-cmd.sh"]
-
-# building env for ProteinDF ===========================================
-RUN set -x \
-  && groupadd -g ${PDF_GRPID} ${PDF_GRP} \
-  && useradd -u ${PDF_USERID} -g ${PDF_GRP} -d /home/${PDF_USER} --create-home -s /bin/bash ${PDF_USER} \
-  && mkdir -p /home/${PDF_USER} \
-  && mkdir -p ${PDF_HOME} ${WORKDIR} \
-  && chown -R ${PDF_USER}:${PDF_GRP} /home/${PDF_USER} \
-  && chown -R ${PDF_USER}:${PDF_GRP} ${PDF_HOME} \
-  && chown -R ${PDF_USER}:${PDF_GRP} ${WORKDIR}
-
-
-# account ==============================================================
-USER ${PDF_USER}
-WORKDIR ${WORKDIR}
-ENV PDF_HOME="${PDF_HOME}" 
-ENV PATH="${PATH}:${PDF_HOME}/bin"
-
-#WORKDIR /home/${PDF_USER}
-#ENV HOME /home/${PDF_USER}
-#VOLUME ["${PDF_HOME}"]
-#ENV WORKDIR="${WORKDIR}"
