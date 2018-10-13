@@ -13,6 +13,7 @@ start:
 	docker run -d \
 		--rm \
 		--name ${CONTAINER_NAME} \
+		--publish "8888:8888" \
 		--volume "${PWD}/work:/work" \
 		"${PACKAGE}:${TAG}"
 
@@ -33,6 +34,6 @@ logs:
 
 
 pdf-check:
-	docker exec -it ${CONTAINER_NAME} pdf-install.sh --branch master pytools bridge qclobot
-	docker exec -it ${CONTAINER_NAME} pdf-install.sh --branch ${PDF_BRANCH} --use-cmake pdf
+	docker exec -it ${CONTAINER_NAME} pdf-install.sh --branch master ProteinDF_bridge ProteinDF_pytools  QCLObot
+	docker exec -it ${CONTAINER_NAME} pdf-install.sh --branch ${PDF_BRANCH} ProteinDF
 	docker exec -it ${CONTAINER_NAME} pdf-check.sh --branch develop serial_dev

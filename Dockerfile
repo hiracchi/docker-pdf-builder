@@ -9,6 +9,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.version=$VERSION \
       maintainer="Toshiyuki Hirano <hiracchi@gmail.com>"
 
+ARG NGLVIEW_VER=1.1.7
 ARG PDF_HOME="/opt/ProteinDF"
 ARG WORKDIR="/work"
 
@@ -32,18 +33,37 @@ RUN apt-get update \
   libhdf5-openmpi-dev \
   \
   python3-dev python3-pip \
-  python3-numpy python3-scipy python3-pandas \
-  python3-matplotlib \
-  python3-yaml python3-msgpack \
-  python3-jinja2 \
-  python3-sklearn-lib \
-  python3-requests python3-bs4 \
-  python3-h5py python3-hdf5storage \
   && apt-get clean && apt-get autoclean \
   && rm -rf /var/lib/apt/lists/*
 
+# =============================================================================
+# pip package 
+# =============================================================================
+RUN set -x \
+  && pip3 install --no-cache-dir \
+    msgpack-python pyyaml \
+    numpy scipy sympy pandas xlrd xlwt \
+    matplotlib  bokeh \
+    scikit-learn \
+    h5py tqdm \
+    requests beautifulsoup4 \
+    jinja2 \
+    jupyter \
+    jupyter_contrib_nbextensions \
+    jupyter_nbextensions_configurator \
+    ipywidgets \
+    nglview==${NGLVIEW_VER}
 
-# viennacl-dev =========================================================
+RUN set -x \
+  && jupyter contrib nbextension install \
+  && jupyter nbextensions_configurator enable \
+  && jupyter nbextension enable widgetsnbextension \
+  && jupyter-nbextension enable nglview 
+
+
+# =============================================================================
+# viennacl-dev 
+# =============================================================================
 RUN set -x \
   && cd /tmp \
   && git clone "https://github.com/viennacl/viennacl-dev.git" \
@@ -54,7 +74,9 @@ RUN set -x \
   && make install
 
 
-# google-test ==========================================================
+# =============================================================================
+# google-test 
+# =============================================================================
 RUN set -x \
   && cd /tmp \
   && git clone "https://github.com/google/googletest.git" \
@@ -66,9 +88,27 @@ RUN set -x \
   && rm -rf /tmp/googletest
 
 
-# entrypoint ===========================================================
-COPY docker-*.sh pdf-*.sh env2cmake.py /usr/local/bin/
+# -----------------------------------------------------------------------------
+# setup dirs 
+# -----------------------------------------------------------------------------
+RUN set -x \
+  && mkdir -p "${WORKDIR}" \
+  && chmod 777 "${WORKDIR}" \
+  && mv /root/.jupyter "${WORKDIR}" \
+  && ln -s "${WORKDIR}/.jupyter" /root/.jupyter 
+
+
+# =============================================================================
+# entrypoint 
+# =============================================================================
+COPY docker-*.sh pdf-*.sh env2cmake.py run-*.sh /usr/local/bin/
+RUN set -x \
+  && chmod +x /usr/local/bin/*.sh /usr/local/bin/*.py
+
 WORKDIR ${WORKDIR}
 ENV PDF_HOME="${PDF_HOME}" PATH="${PATH}:${PDF_HOME}/bin"
+ENV WORKDIR="${WORKDIR}"
+VOLUME ${WORKDIR}
+
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-#CMD ["/usr/local/bin/docker-cmd.sh"]
+CMD ["/usr/local/bin/run-jupyter.sh"]
