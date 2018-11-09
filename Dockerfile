@@ -30,7 +30,7 @@ RUN apt-get update \
   libhdf5-dev \
   libhdf5-openmpi-dev \
   \
-  python3-dev python3-pip \
+  python3-dev python3-setuptools python3-pip \
   && apt-get clean && apt-get autoclean \
   && rm -rf /var/lib/apt/lists/*
 
