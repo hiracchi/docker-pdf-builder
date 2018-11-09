@@ -16,10 +16,8 @@ ARG WORKDIR="/work"
 
 # packages =============================================================
 RUN apt-get update \
-  && apt-get install -y \
-  sudo \
+  && apt-get install -y --no-install-recommends \
   build-essential pkg-config ca-certificates \
-  vim less \
   git automake autoconf libtool cmake \
   liblapack-dev \
   openmpi-bin libopenmpi-dev \
@@ -52,6 +50,7 @@ RUN set -x \
     jupyter_contrib_nbextensions \
     jupyter_nbextensions_configurator \
     ipywidgets \
+    pytraj \
     nglview==${NGLVIEW_VER}
 
 RUN set -x \
@@ -110,5 +109,4 @@ ENV PDF_HOME="${PDF_HOME}" PATH="${PATH}:${PDF_HOME}/bin"
 ENV WORKDIR="${WORKDIR}"
 VOLUME ${WORKDIR}
 
-# ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["/usr/local/bin/run-jupyter.sh"]
