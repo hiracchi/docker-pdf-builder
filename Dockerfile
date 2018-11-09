@@ -1,4 +1,4 @@
-FROM hiracchi/ubuntu-ja:18.04
+FROM hiracchi/ubuntu-ja:18.04.1
 
 ARG BUILD_DATE
 ARG VCS_REF
@@ -110,5 +110,5 @@ ENV PDF_HOME="${PDF_HOME}" PATH="${PATH}:${PDF_HOME}/bin"
 ENV WORKDIR="${WORKDIR}"
 VOLUME ${WORKDIR}
 
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+# ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["/usr/local/bin/run-jupyter.sh"]
