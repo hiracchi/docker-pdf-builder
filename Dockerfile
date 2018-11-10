@@ -16,7 +16,7 @@ ARG WORKDIR="/work"
 
 # packages =============================================================
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends \
+  && apt-get install -y \
   build-essential pkg-config ca-certificates \
   git automake autoconf libtool cmake \
   liblapack-dev \
@@ -30,7 +30,7 @@ RUN apt-get update \
   libhdf5-dev \
   libhdf5-openmpi-dev \
   \
-  python3-dev python3-setuptools python3-pip \
+  python3-dev python3-setuptools python3-pip python3-wheel \
   && apt-get clean && apt-get autoclean \
   && rm -rf /var/lib/apt/lists/*
 
