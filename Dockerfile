@@ -94,14 +94,14 @@ RUN set -x \
 # =============================================================================
 # viennacl-dev
 # =============================================================================
-# RUN set -x \
-#   && cd /tmp \
-#   && curl -L -o ViennaCL-1.7.1.tar.gz "http://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.tar.gz/download" \
-#   && tar zxvf ViennaCL-1.7.1.tar.gz \
-#   && cd /tmp/ViennaCL-1.7.1/build \
-#   && cmake .. \
-#   && make\
-#   && make install
+RUN set -x \
+  && cd /tmp \
+  && curl -L -o ViennaCL-1.7.1.tar.gz "http://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.tar.gz/download" \
+  && tar zxvf ViennaCL-1.7.1.tar.gz \
+  && cd /tmp/ViennaCL-1.7.1/build \
+  && cmake .. \
+  && make\
+  && make install
 
 # RUN set -x \
 #   && cd /tmp \

@@ -1,12 +1,12 @@
 PACKAGE=hiracchi/pdf-builder
-TAG=latest
+TAG=2020.3
 CONTAINER_NAME=pdf-builder
 PDF_BRANCH=develop
 
 .PHONY: build start stop restart term logs
 
 build:
-	docker build -t "${PACKAGE}:${TAG}" . 2>&1 | tee out.build
+	docker build -t "${PACKAGE}:${TAG}" . 2>&1 | tee docker-build.log
 
 
 start:
