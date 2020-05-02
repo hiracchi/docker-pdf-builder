@@ -9,8 +9,8 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
   org.label-schema.version=$VERSION \
   maintainer="Toshiyuki Hirano <hiracchi@gmail.com>"
 
-ARG PDF_HOME="/opt/ProteinDF"
 ARG WORKDIR="/work"
+ARG PDF_HOME="${WORKDIR}/dist"
 
 ENV LANG="ja_JP.UTF-8" LANGUAGE="ja_JP:en" LC_ALL="ja_JP.UTF-8" TZ="Asia/Tokyo"
 ENV DEBIAN_FRONTEND=noninteractive
@@ -80,11 +80,11 @@ RUN set -x && \
 # -----------------------------------------------------------------------------
 # setup dirs
 # -----------------------------------------------------------------------------
-# RUN set -x \
-#   && mkdir -p "${WORKDIR}" \
-#   && chmod 777 "${WORKDIR}" \
-#   && mv /root/.jupyter "${WORKDIR}" \
-#   && ln -s "${WORKDIR}/.jupyter" /root/.jupyter
+RUN set -x && \
+  mkdir -p "${WORKDIR}" && \
+  chown -R ${USER_NAME}:${GROUP_NAME} "${WORKDIR}" 
+WORKDIR ${WORKDIR}
+ENV WORKDIR="${WORKDIR}"
 
 
 # =============================================================================
@@ -92,10 +92,9 @@ RUN set -x && \
 # =============================================================================
 COPY scripts/* /usr/local/bin/
 
-WORKDIR ${WORKDIR}
 ENV PDF_HOME="${PDF_HOME}" PATH="${PATH}:${PDF_HOME}/bin"
-ENV WORKDIR="${WORKDIR}"
-VOLUME ${WORKDIR}
 
+USER ${USER_NAME}
+VOLUME ${WORKDIR}
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["/usr/bin/tail", "-f", "/dev/null"]
