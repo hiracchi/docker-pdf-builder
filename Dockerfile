@@ -92,7 +92,7 @@ ENV WORKDIR="${WORKDIR}"
 # =============================================================================
 COPY scripts/* /usr/local/bin/
 
-ENV PDF_HOME="${PDF_HOME}" PATH="${PATH}:${PDF_HOME}/bin"
+ENV PDF_HOME="${PDF_HOME}" PATH="${PATH}:/home/${USER_NAME}/.local/bin:${PDF_HOME}/bin"
 
 USER ${USER_NAME}
 VOLUME ${WORKDIR}

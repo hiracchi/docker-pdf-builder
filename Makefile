@@ -1,5 +1,5 @@
 PACKAGE=hiracchi/pdf-builder
-TAG=2020.5
+TAG=2020.6
 CONTAINER_NAME=pdf-builder
 PDF_BRANCH=develop
 
